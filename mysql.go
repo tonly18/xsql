@@ -213,9 +213,6 @@ func (d *XSQL) QueryRow() (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(data) < 1 {
-		return nil, errors.New("query row not found data")
-	}
 
 	return data[0], nil
 }
@@ -242,6 +239,9 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 			return nil, err
 		}
 		data = append(data, genRecord(entity, d.fields))
+	}
+	if len(data) < 1 {
+		return nil, sql.ErrNoRows
 	}
 
 	//return
@@ -271,6 +271,9 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 		}
 		record := genRecord(entity, d.fields)
 		data[cast.ToInt(record[d.primary])] = record
+	}
+	if len(data) < 1 {
+		return nil, sql.ErrNoRows
 	}
 
 	//return
