@@ -17,9 +17,6 @@ func TestZeroGroup(t *testing.T) {
 	}
 
 	db := xsql.NewXSQL(dbConfig)
-	//if err := db.Connect(dbConfig); err != nil {
-	//	fmt.Println("err:::::::::::", err)
-	//}
 
 	//db.Table("bag_0000").Primary("uid").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
 	//rawsql := db.GenRawSQL()
