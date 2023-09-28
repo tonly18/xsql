@@ -2,8 +2,8 @@ package xsql_test
 
 import (
 	"fmt"
+	"github.com/tonly18/xsql"
 	"testing"
-	"xsql"
 )
 
 func TestZeroGroup(t *testing.T) {

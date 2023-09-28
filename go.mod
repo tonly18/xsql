@@ -1,4 +1,4 @@
-module xsql
+module github.com/tonly18/xsql
 
 go 1.21
 
