@@ -1,6 +1,7 @@
 package xsql
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -17,7 +18,8 @@ var once sync.Once
 var dbConn *sql.DB
 
 type XSQL struct {
-	db *sql.DB
+	ctx context.Context
+	db  *sql.DB
 
 	table     string   //表名
 	primary   string   //表主键
@@ -34,8 +36,9 @@ type XSQL struct {
 }
 
 // NewXSQL
-func NewXSQL(config *Config) *XSQL {
+func NewXSQL(ctx context.Context, config *Config) *XSQL {
 	xsql := &XSQL{
+		ctx:     ctx,
 		primary: "id", //默认主键
 		fields:  make([]string, 0, 20),
 		values:  make([]any, 0, 20),

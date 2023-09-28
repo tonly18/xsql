@@ -1,12 +1,13 @@
 package xsql_test
 
 import (
+	"context"
 	"fmt"
 	"github.com/tonly18/xsql"
 	"testing"
 )
 
-func TestZeroGroup(t *testing.T) {
+func TestXSQL(t *testing.T) {
 	dbConfig := &xsql.Config{
 		Host:     "127.0.0.1",
 		Port:     3306,
@@ -16,7 +17,7 @@ func TestZeroGroup(t *testing.T) {
 		Charset:  "utf8",
 	}
 
-	db := xsql.NewXSQL(dbConfig)
+	db := xsql.NewXSQL(context.Background(), dbConfig)
 
 	//db.Table("bag_0000").Primary("uid").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
 	//rawsql := db.GenRawSQL()
