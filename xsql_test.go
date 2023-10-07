@@ -19,13 +19,46 @@ func TestXSQL(t *testing.T) {
 
 	db := xsql.NewXSQL(context.Background(), dbConfig)
 
+	//select
 	//db.Table("bag_0000").Primary("uid").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
 	//rawsql := db.GenRawSQL()
 	//fmt.Println("rawsql:::::::", rawsql)
 
 	//data, err := db.Table("bag_0000").Primary("uid").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)").Query()
-	data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
-	fmt.Println("err:::::::", err)
-	fmt.Println("data:::::::", data)
+	//data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
+	//fmt.Println("err:::::::", err)
+	//fmt.Println("data:::::::", data)
+
+	//Insert
+	//result, err := db.Table("bag_0001").Insert(map[string]any{
+	//	"uid":    17,
+	//	"item":   "item-17",
+	//	"expire": "expire-17",
+	//	"itime":  1988121600,
+	//}).Exec()
+	//fmt.Println("err::::::::", err)
+	//count, err := result.RowsAffected()
+	//fmt.Println("result-count,err::::::::", count, err)
+	//newId, err := result.LastInsertId()
+	//fmt.Println("result-newId,err::::::::", newId, err)
+
+	//modify
+	//result, err := db.Table("bag_0001").Where("uid=17").Modify(map[string]any{
+	//	"item":   "item-17-m",
+	//	"expire": "expire-17-m",
+	//}).Exec()
+	//fmt.Println("err::::::::", err)
+	//count, err := result.RowsAffected()
+	//fmt.Println("result-count,err::::::::", count, err)
+	//newId, err := result.LastInsertId()
+	//fmt.Println("result-newId,err::::::::", newId, err)
+
+	//delete
+	result, err := db.Table("bag_0000").Where("uid=14").Delete().Exec()
+	fmt.Println("err::::::::", err)
+	count, err := result.RowsAffected()
+	fmt.Println("result-count,err::::::::", count, err)
+	newId, err := result.LastInsertId()
+	fmt.Println("result-newId,err::::::::", newId, err)
 
 }

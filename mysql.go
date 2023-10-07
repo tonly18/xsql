@@ -336,7 +336,10 @@ func (d *XSQL) Modify(params map[string]any) *XSQL {
 		d.values = append(d.values, v)
 	}
 	if len(params) > 0 {
-		d.sql = fmt.Sprintf(`UPDATE %v SET %v WHERE %v`, d.table, strings.Join(d.fields, ","), strings.Join(d.where, ""))
+		d.sql = fmt.Sprintf(`UPDATE %v SET %v`, d.table, strings.Join(d.fields, ","))
+	}
+	if len(d.where) > 0 {
+		d.sql = fmt.Sprintf(`%v WHERE %v`, d.sql, strings.Join(d.where, ""))
 	}
 
 	//return
@@ -345,7 +348,11 @@ func (d *XSQL) Modify(params map[string]any) *XSQL {
 
 // Delete 删除数据
 func (d *XSQL) Delete() *XSQL {
-	d.sql = fmt.Sprintf(`DELETE FROM %v WHERE %v`, d.table, strings.Join(d.where, ""))
+	d.sql = fmt.Sprintf(`DELETE FROM %v`, d.table)
+
+	if len(d.where) > 0 {
+		d.sql = fmt.Sprintf(`%v WHERE %v`, d.sql, strings.Join(d.where, ""))
+	}
 
 	//return
 	return d
@@ -371,13 +378,39 @@ func (d *XSQL) Exec() (sql.Result, error) {
 
 // RestSQL
 func (d *XSQL) RestSQL() {
-	d.table = ""
-	d.fields = make([]string, 0, 20)
-	d.values = make([]any, 0, 20)
-	d.where = make([]string, 0, 5)
-	d.group, d.have = "", ""
-	d.order = ""
-	d.on, d.leftJoin, d.rightJoin = "", "", ""
-
 	d.sql = ""
+
+	if d.table != "" {
+		d.table = ""
+	}
+	if d.primary != "id" {
+		d.primary = "id"
+	}
+	if len(d.fields) > 0 {
+		d.fields = make([]string, 0, 20)
+	}
+	if len(d.values) > 0 {
+		d.values = make([]any, 0, 20)
+	}
+	if len(d.where) > 0 {
+		d.where = make([]string, 0, 5)
+	}
+	if d.group != "" {
+		d.group = ""
+	}
+	if d.have != "" {
+		d.have = ""
+	}
+	if d.order != "" {
+		d.order = ""
+	}
+	if d.on != "" {
+		d.on = ""
+	}
+	if d.leftJoin != "" {
+		d.leftJoin = ""
+	}
+	if d.rightJoin != "" {
+		d.rightJoin = ""
+	}
 }
