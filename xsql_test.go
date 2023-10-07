@@ -54,11 +54,15 @@ func TestXSQL(t *testing.T) {
 	//fmt.Println("result-newId,err::::::::", newId, err)
 
 	//delete
-	result, err := db.Table("bag_0000").Where("uid=14").Delete().Exec()
-	fmt.Println("err::::::::", err)
-	count, err := result.RowsAffected()
-	fmt.Println("result-count,err::::::::", count, err)
-	newId, err := result.LastInsertId()
-	fmt.Println("result-newId,err::::::::", newId, err)
+	//result, err := db.Table("bag_0000").Where("uid=14").Delete().Exec()
+	//fmt.Println("err::::::::", err)
+	//count, err := result.RowsAffected()
+	//fmt.Println("result-count,err::::::::", count, err)
+	//newId, err := result.LastInsertId()
+	//fmt.Println("result-newId,err::::::::", newId, err)
 
+	//Transaction
+	tx, err := db.Begin()
+	fmt.Println("err::::::::", err)
+	fmt.Println("tx:::::::::", tx)
 }

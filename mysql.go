@@ -414,3 +414,12 @@ func (d *XSQL) RestSQL() {
 		d.rightJoin = ""
 	}
 }
+
+// Transaction
+func (d *XSQL) Begin() (*sql.Tx, error) {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	return tx, nil
+}
