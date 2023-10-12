@@ -225,10 +225,10 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	defer d.RestSQL()
 
 	//生成SQL
-	d.sql = d.GenRawSQL()
+	rawsql := d.GenRawSQL()
 
 	//QUERY
-	rows, err := d.db.Query(d.sql)
+	rows, err := d.db.Query(rawsql)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 		}
 		data = append(data, genRecord(entity, d.fields))
 	}
-	if len(data) < 1 {
+	if len(data) == 0 {
 		return nil, sql.ErrNoRows
 	}
 
@@ -256,10 +256,10 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	defer d.RestSQL()
 
 	//生成SQL
-	d.sql = d.GenRawSQL()
+	rawsql := d.GenRawSQL()
 
 	//QUERY
-	rows, err := d.db.Query(d.sql)
+	rows, err := d.db.Query(rawsql)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 		record := genRecord(entity, d.fields)
 		data[cast.ToInt(record[d.primary])] = record
 	}
-	if len(data) < 1 {
+	if len(data) == 0 {
 		return nil, sql.ErrNoRows
 	}
 
