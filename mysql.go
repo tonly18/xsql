@@ -46,12 +46,9 @@ func NewXSQL(ctx context.Context, config *Config) *XSQL {
 	}
 	once.Do(func() {
 		if err := xsql.connect(config); err != nil {
-			panic(fmt.Errorf(`new xsql happened error:%v`, err))
+			panic(fmt.Errorf(`[new xsql] once.do error: %w`, err))
 		}
 	})
-	if dbConn == nil {
-		xsql.connect(config)
-	}
 	xsql.db = dbConn
 
 	//return
@@ -78,13 +75,13 @@ func (d *XSQL) connect(config *Config) error {
 	}
 	dbConn, err = sql.Open("mysql", fmt.Sprintf(`%s:%s@tcp(%s:%d)/%s?charset=%s`, config.UserName, config.Password, config.Host, config.Port, config.DBName, config.Charset))
 	if err != nil {
-		return err
+		return fmt.Errorf(`[connect] sql.Open error: %w`, err)
 	}
 	if dbConn == nil {
-		return errors.New("sql.open happened error")
+		return errors.New("[connect] db conn is nil")
 	}
 	if err = dbConn.Ping(); err != nil {
-		return err
+		return fmt.Errorf(`[connect] ping error: %w`, err)
 	}
 
 	//设置连接可以重用的最长时间
@@ -214,7 +211,7 @@ func (d *XSQL) OrderBy(order string) *XSQL {
 func (d *XSQL) QueryRow() (map[string]any, error) {
 	data, err := d.Query()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[queryrow] happened error: %w`, err)
 	}
 
 	return data[0], nil
@@ -230,7 +227,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	//QUERY
 	rows, err := d.db.Query(rawsql)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[query] SQL:%v, ERROR: %w`, rawsql, err)
 	}
 	defer rows.Close()
 
@@ -239,12 +236,12 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`[query] rows.Scan SQL:%v, ERROR: %w`, rawsql, err)
 		}
 		data = append(data, genRecord(entity, d.fields))
 	}
 	if len(data) == 0 {
-		return nil, sql.ErrNoRows
+		return nil, fmt.Errorf(`[query] data is empty SQL:%v, ERROR: %w`, rawsql, sql.ErrNoRows)
 	}
 
 	//return
@@ -261,7 +258,7 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	//QUERY
 	rows, err := d.db.Query(rawsql)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[query map] SQL:%v, ERROR: %w`, rawsql, err)
 	}
 	defer rows.Close()
 
@@ -270,13 +267,13 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`[query map] rows.scan SQL:%v, ERROR: %w`, rawsql, err)
 		}
 		record := genRecord(entity, d.fields)
 		data[cast.ToInt(record[d.primary])] = record
 	}
 	if len(data) == 0 {
-		return nil, sql.ErrNoRows
+		return nil, fmt.Errorf(`[query map] data is empty SQL:%v, ERROR: %w`, rawsql, sql.ErrNoRows)
 	}
 
 	//return
@@ -364,13 +361,13 @@ func (d *XSQL) Exec() (sql.Result, error) {
 
 	stmt, err := d.db.Prepare(d.sql)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[exec] SQL:%v, ERROR: %w`, d.sql, err)
 	}
 	defer stmt.Close()
 
 	result, err := stmt.Exec(d.values...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[exec] stmt.exec SQL:%v, ERROR: %w`, d.sql, err)
 	}
 
 	return result, nil
@@ -419,7 +416,7 @@ func (d *XSQL) RestSQL() {
 func (d *XSQL) Begin() (*sql.Tx, error) {
 	tx, err := d.db.Begin()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`[begin] error: %w`, err)
 	}
 	return tx, nil
 }
