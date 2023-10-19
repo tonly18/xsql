@@ -78,7 +78,7 @@ func (d *XSQL) connect(config *Config) error {
 		return fmt.Errorf(`[connect] sql.Open error: %w`, err)
 	}
 	if dbConn == nil {
-		return errors.New("[connect] db conn is nil")
+		return fmt.Errorf(`%w`, errors.New("[connect] db conn is nil"))
 	}
 	if err = dbConn.Ping(); err != nil {
 		return fmt.Errorf(`[connect] ping error: %w`, err)

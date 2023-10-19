@@ -2,6 +2,8 @@ package xsql_test
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/tonly18/xsql"
 	"testing"
@@ -28,6 +30,10 @@ func TestXSQL(t *testing.T) {
 	//data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
 	fmt.Println("err:::::::", err)
 	fmt.Println("data:::::::", data)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("sql.ErrNoRows::::::", sql.ErrNoRows)
+	}
 
 	//Insert
 	//result, err := db.Table("bag_0001").Insert(map[string]any{
