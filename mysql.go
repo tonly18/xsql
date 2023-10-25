@@ -39,7 +39,7 @@ type XSQL struct {
 func NewXSQL(ctx context.Context, config *Config) *XSQL {
 	xsql := &XSQL{
 		ctx:     ctx,
-		primary: "id", //默认主键
+		primary: primary, //默认主键
 		fields:  make([]string, 0, 20),
 		values:  make([]any, 0, 20),
 		where:   make([]string, 0, 5),
@@ -211,7 +211,7 @@ func (d *XSQL) OrderBy(order string) *XSQL {
 func (d *XSQL) QueryRow() (map[string]any, error) {
 	data, err := d.Query()
 	if err != nil {
-		return nil, fmt.Errorf(`[queryrow] happened error: %w`, err)
+		return nil, err
 	}
 
 	return data[0], nil
@@ -227,7 +227,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	//QUERY
 	rows, err := d.db.Query(rawsql)
 	if err != nil {
-		return nil, fmt.Errorf(`[query] SQL:%v, ERROR: %w`, rawsql, err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -236,12 +236,12 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
-			return nil, fmt.Errorf(`[query] rows.Scan SQL:%v, ERROR: %w`, rawsql, err)
+			return nil, err
 		}
 		data = append(data, genRecord(entity, d.fields))
 	}
 	if len(data) == 0 {
-		return nil, fmt.Errorf(`[query] data is empty SQL:%v, ERROR: %w`, rawsql, sql.ErrNoRows)
+		return nil, sql.ErrNoRows
 	}
 
 	//return
@@ -258,7 +258,7 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	//QUERY
 	rows, err := d.db.Query(rawsql)
 	if err != nil {
-		return nil, fmt.Errorf(`[query map] SQL:%v, ERROR: %w`, rawsql, err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -267,13 +267,13 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
-			return nil, fmt.Errorf(`[query map] rows.scan SQL:%v, ERROR: %w`, rawsql, err)
+			return nil, err
 		}
 		record := genRecord(entity, d.fields)
 		data[cast.ToInt(record[d.primary])] = record
 	}
 	if len(data) == 0 {
-		return nil, fmt.Errorf(`[query map] data is empty SQL:%v, ERROR: %w`, rawsql, sql.ErrNoRows)
+		return nil, sql.ErrNoRows
 	}
 
 	//return
@@ -361,13 +361,13 @@ func (d *XSQL) Exec() (sql.Result, error) {
 
 	stmt, err := d.db.Prepare(d.sql)
 	if err != nil {
-		return nil, fmt.Errorf(`[exec] SQL:%v, ERROR: %w`, d.sql, err)
+		return nil, err
 	}
 	defer stmt.Close()
 
 	result, err := stmt.Exec(d.values...)
 	if err != nil {
-		return nil, fmt.Errorf(`[exec] stmt.exec SQL:%v, ERROR: %w`, d.sql, err)
+		return nil, err
 	}
 
 	return result, nil
@@ -416,7 +416,7 @@ func (d *XSQL) RestSQL() {
 func (d *XSQL) Begin() (*sql.Tx, error) {
 	tx, err := d.db.Begin()
 	if err != nil {
-		return nil, fmt.Errorf(`[begin] error: %w`, err)
+		return nil, err
 	}
 	return tx, nil
 }

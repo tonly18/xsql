@@ -26,8 +26,8 @@ func TestXSQL(t *testing.T) {
 	//rawsql := db.GenRawSQL()
 	//fmt.Println("rawsql:::::::", rawsql)
 
-	data, err := db.Table("bag_0000").Primary("uid").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
-	//data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
+	//data, err := db.Table("bag_0000").Primary("uid").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
+	data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
 	fmt.Println("err:::::::", err)
 	fmt.Println("data:::::::", data)
 

@@ -2,6 +2,11 @@ package xsql
 
 import "time"
 
+const (
+	//默认主键
+	primary = "id"
+)
+
 type Config struct {
 	Host     string
 	Port     int
