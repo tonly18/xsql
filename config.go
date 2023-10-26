@@ -23,8 +23,8 @@ type Config struct {
 	DBName   string
 	Charset  string
 
-	ConnMaxLifetime time.Duration
-	ConnMaxIdleTime time.Duration
-	MaxOpenConns    int
-	MaxIdleConns    int
+	MaxLifetime  time.Duration
+	MaxIdleTime  time.Duration
+	MaxOpenConns int
+	MaxIdleConns int
 }

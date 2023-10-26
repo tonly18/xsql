@@ -66,11 +66,11 @@ func (d *XSQL) connect(config *Config) error {
 	if config.Charset == "" {
 		config.Charset = "utf8"
 	}
-	if config.ConnMaxLifetime == 0 {
-		config.ConnMaxLifetime = time.Second * maxLifeTime
+	if config.MaxLifetime == 0 {
+		config.MaxLifetime = time.Second * maxLifeTime
 	}
-	if config.ConnMaxIdleTime == 0 {
-		config.ConnMaxIdleTime = time.Second * maxIdleTime
+	if config.MaxIdleTime == 0 {
+		config.MaxIdleTime = time.Second * maxIdleTime
 	}
 	if config.MaxOpenConns == 0 {
 		config.MaxOpenConns = maxOpenConns
@@ -90,9 +90,9 @@ func (d *XSQL) connect(config *Config) error {
 	}
 
 	//设置连接池里的连接最大存活时长(通常比mysql服务器wait_timeout小)
-	dbConn.SetConnMaxLifetime(config.ConnMaxLifetime)
+	dbConn.SetConnMaxLifetime(config.MaxLifetime)
 	//设置连接池里的连接最大空闲时长(连接每次被使用后,持续空闲时长会被重置,从0开始从新计算)
-	dbConn.SetConnMaxIdleTime(config.ConnMaxIdleTime)
+	dbConn.SetConnMaxIdleTime(config.MaxIdleTime)
 	//设置连接池最多同时打开的连接数,如果n<=0(默认值为0,无限制)
 	dbConn.SetMaxOpenConns(config.MaxOpenConns)
 	//设置连接池里最大空闲连接数,如果n<=0(则不保留任何空闲连接), 必须要比maxOpenConns小
