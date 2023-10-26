@@ -49,6 +49,9 @@ func NewXSQL(ctx context.Context, config *Config) *XSQL {
 			panic(fmt.Errorf(`[new xsql] once.do error: %w`, err))
 		}
 	})
+	if dbConn == nil {
+		xsql.connect(config)
+	}
 	xsql.db = dbConn
 
 	//return
@@ -62,13 +65,13 @@ func (d *XSQL) connect(config *Config) error {
 		config.Charset = "utf8"
 	}
 	if config.ConnMaxLifetime == 0 {
-		config.ConnMaxLifetime = 300 * time.Second
+		config.ConnMaxLifetime = 3600 * time.Second
 	}
 	if config.ConnMaxIdleTime == 0 {
-		config.ConnMaxIdleTime = 300 * time.Second
+		config.ConnMaxIdleTime = 600 * time.Second
 	}
 	if config.MaxOpenConns == 0 {
-		config.MaxOpenConns = 10
+		config.MaxOpenConns = 50
 	}
 	if config.MaxIdleConns == 0 {
 		config.MaxIdleConns = 10
@@ -84,13 +87,13 @@ func (d *XSQL) connect(config *Config) error {
 		return fmt.Errorf(`[connect] ping error: %w`, err)
 	}
 
-	//设置连接可以重用的最长时间
+	//设置连接池里的连接最大存活时长(通常比mysql服务器wait_timeout小)
 	dbConn.SetConnMaxLifetime(config.ConnMaxLifetime)
-	//设置连接可能处于空闲状态的最长时间
+	//设置连接池里的连接最大空闲时长(连接每次被使用后,持续空闲时长会被重置,从0开始从新计算)
 	dbConn.SetConnMaxIdleTime(config.ConnMaxIdleTime)
-	//设置与数据库的最大打开连接数,如果 n <= 0,则对打开的连接数没有限制(默认值为0,无限制)
+	//设置连接池最多同时打开的连接数,如果n<=0(默认值为0,无限制)
 	dbConn.SetMaxOpenConns(config.MaxOpenConns)
-	//设置空闲连接池的最大连接数,如果 n <= 0，则不保留任何空闲连接
+	//设置连接池里最大空闲连接数,如果n<=0(则不保留任何空闲连接), 必须要比maxOpenConns小
 	dbConn.SetMaxIdleConns(config.MaxIdleConns)
 
 	//Finalizer
