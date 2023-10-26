@@ -50,7 +50,9 @@ func NewXSQL(ctx context.Context, config *Config) *XSQL {
 		}
 	})
 	if dbConn == nil {
-		xsql.connect(config)
+		if err := xsql.connect(config); err != nil {
+			panic(fmt.Errorf(`[new xsql] dbConn is nil, error: %w`, err))
+		}
 	}
 	xsql.db = dbConn
 
@@ -65,16 +67,16 @@ func (d *XSQL) connect(config *Config) error {
 		config.Charset = "utf8"
 	}
 	if config.ConnMaxLifetime == 0 {
-		config.ConnMaxLifetime = 3600 * time.Second
+		config.ConnMaxLifetime = time.Second * maxLifeTime
 	}
 	if config.ConnMaxIdleTime == 0 {
-		config.ConnMaxIdleTime = 600 * time.Second
+		config.ConnMaxIdleTime = time.Second * maxIdleTime
 	}
 	if config.MaxOpenConns == 0 {
-		config.MaxOpenConns = 50
+		config.MaxOpenConns = maxOpenConns
 	}
 	if config.MaxIdleConns == 0 {
-		config.MaxIdleConns = 10
+		config.MaxIdleConns = maxIdleConns
 	}
 	dbConn, err = sql.Open("mysql", fmt.Sprintf(`%s:%s@tcp(%s:%d)/%s?charset=%s`, config.UserName, config.Password, config.Host, config.Port, config.DBName, config.Charset))
 	if err != nil {
@@ -286,6 +288,7 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 // GenRawSQL 生成查询SQL
 func (d *XSQL) GenRawSQL() string {
 	var rawsql strings.Builder
+
 	if len(d.fields) > 0 && d.table != "" {
 		rawsql.WriteString(fmt.Sprintf("SELECT %v FROM %v", strings.Join(d.fields, ","), d.table))
 	}
@@ -317,6 +320,8 @@ func (d *XSQL) GenRawSQL() string {
 
 // Insert 插入数据
 func (d *XSQL) Insert(params map[string]any) *XSQL {
+	defer d.RestSQL()
+
 	for k, v := range params {
 		d.fields = append(d.fields, k)
 		d.values = append(d.values, v)
@@ -331,6 +336,8 @@ func (d *XSQL) Insert(params map[string]any) *XSQL {
 
 // Modify 修改数据
 func (d *XSQL) Modify(params map[string]any) *XSQL {
+	defer d.RestSQL()
+
 	for k, v := range params {
 		d.fields = append(d.fields, fmt.Sprintf(`%v=?`, k))
 		d.values = append(d.values, v)
@@ -348,8 +355,9 @@ func (d *XSQL) Modify(params map[string]any) *XSQL {
 
 // Delete 删除数据
 func (d *XSQL) Delete() *XSQL {
-	d.sql = fmt.Sprintf(`DELETE FROM %v`, d.table)
+	defer d.RestSQL()
 
+	d.sql = fmt.Sprintf(`DELETE FROM %v`, d.table)
 	if len(d.where) > 0 {
 		d.sql = fmt.Sprintf(`%v WHERE %v`, d.sql, strings.Join(d.where, ""))
 	}
