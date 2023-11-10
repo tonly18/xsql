@@ -127,9 +127,6 @@ func (d *XSQL) Primary(key string) *XSQL {
 func (d *XSQL) Fields(fields ...string) *XSQL {
 	if len(fields) > 0 {
 		d.fields = append(d.fields, fields...)
-		if false == slices.Contains(d.fields, d.primary) {
-			d.fields = append(d.fields, d.primary)
-		}
 	}
 
 	//return
@@ -259,6 +256,11 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 // QueryMap 查询数据
 func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 	defer d.RestSQL()
+
+	//默认主键
+	if len(d.fields) > 0 && false == slices.Contains(d.fields, d.primary) {
+		d.fields = append(d.fields, d.primary)
+	}
 
 	//生成SQL
 	rawsql := d.GenRawSQL()
