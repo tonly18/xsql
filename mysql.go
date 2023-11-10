@@ -235,6 +235,9 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 		return nil, err
 	}
 	defer rows.Close()
+	if len(d.fields) == 0 {
+		d.fields, _ = rows.Columns()
+	}
 
 	//字段 - 数据
 	data := make([]map[string]any, 0, 20)
@@ -266,6 +269,9 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 		return nil, err
 	}
 	defer rows.Close()
+	if len(d.fields) == 0 {
+		d.fields, _ = rows.Columns()
+	}
 
 	//字段 - 数据
 	data := make(map[int]map[string]any, 50)
@@ -289,8 +295,10 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 func (d *XSQL) GenRawSQL() string {
 	var rawsql strings.Builder
 
-	if len(d.fields) > 0 && d.table != "" {
-		rawsql.WriteString(fmt.Sprintf("SELECT %v FROM %v", strings.Join(d.fields, ","), d.table))
+	if len(d.fields) == 0 {
+		rawsql.WriteString(fmt.Sprintf(`SELECT * FROM %v`, d.table))
+	} else {
+		rawsql.WriteString(fmt.Sprintf(`SELECT %v FROM %v`, strings.Join(d.fields, ","), d.table))
 	}
 	if len(d.where) > 0 {
 		rawsql.WriteString(fmt.Sprintf(` WHERE %v`, strings.Join(d.where, "")))
@@ -391,8 +399,8 @@ func (d *XSQL) RestSQL() {
 	if d.table != "" {
 		d.table = ""
 	}
-	if d.primary != "id" {
-		d.primary = "id"
+	if d.primary != primary {
+		d.primary = primary
 	}
 	if len(d.fields) > 0 {
 		d.fields = make([]string, 0, 20)
