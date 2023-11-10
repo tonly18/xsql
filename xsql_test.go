@@ -26,11 +26,11 @@ func TestXSQL(t *testing.T) {
 
 	//data, err := db.Table("bag_0000").Primary("uid").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
 	//data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
-	//data, err := db.Table("bag_0000").Where("uid in (6)").Query()
-	sql := db.Table("bag_0000").Fields("uid,item").Where("uid in (6)").GenRawSQL()
-	//fmt.Println("err:::::::", err)
-	//fmt.Println("data:::::::", data)
-	fmt.Println("sql:::::::", sql)
+	data, err := db.Table("bag_0000").Where("uid in (6)").Query()
+	//sql := db.Table("bag_0000").Fields("uid,item").Where("uid in (6)").GenRawSQL()
+	fmt.Println("err:::::::", err)
+	fmt.Println("data:::::::", data)
+	//fmt.Println("sql:::::::", sql)
 
 	//if errors.Is(err, sql.ErrNoRows) {
 	//	fmt.Println("sql.ErrNoRows::::::", sql.ErrNoRows)

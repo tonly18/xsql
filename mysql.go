@@ -127,9 +127,9 @@ func (d *XSQL) Primary(key string) *XSQL {
 func (d *XSQL) Fields(fields ...string) *XSQL {
 	if len(fields) > 0 {
 		d.fields = append(d.fields, fields...)
-	}
-	if false == slices.Contains(d.fields, d.primary) {
-		d.fields = append(d.fields, d.primary)
+		if false == slices.Contains(d.fields, d.primary) {
+			d.fields = append(d.fields, d.primary)
+		}
 	}
 
 	//return
