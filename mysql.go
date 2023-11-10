@@ -8,7 +8,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/cast"
 	"runtime"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -22,7 +21,6 @@ type XSQL struct {
 	db  *sql.DB
 
 	table     string   //表名
-	primary   string   //表主键
 	fields    []string //字段
 	values    []any    //字段-值
 	where     []string //条件
@@ -38,11 +36,10 @@ type XSQL struct {
 // NewXSQL
 func NewXSQL(ctx context.Context, config *Config) *XSQL {
 	xsql := &XSQL{
-		ctx:     ctx,
-		primary: primary, //默认主键
-		fields:  make([]string, 0, 20),
-		values:  make([]any, 0, 20),
-		where:   make([]string, 0, 5),
+		ctx:    ctx,
+		fields: make([]string, 0, 20),
+		values: make([]any, 0, 20),
+		where:  make([]string, 0, 5),
 	}
 	once.Do(func() {
 		if err := xsql.connect(config); err != nil {
@@ -110,14 +107,6 @@ func (d *XSQL) connect(config *Config) error {
 // Table 字段
 func (d *XSQL) Table(table string) *XSQL {
 	d.table = table
-
-	//return
-	return d
-}
-
-// Primary 主键
-func (d *XSQL) Primary(key string) *XSQL {
-	d.primary = key
 
 	//return
 	return d
@@ -254,13 +243,8 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 }
 
 // QueryMap 查询数据
-func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
+func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 	defer d.RestSQL()
-
-	//默认主键
-	if len(d.fields) > 0 && false == slices.Contains(d.fields, d.primary) {
-		d.fields = append(d.fields, d.primary)
-	}
 
 	//生成SQL
 	rawsql := d.GenRawSQL()
@@ -283,7 +267,7 @@ func (d *XSQL) QueryMap() (map[int]map[string]any, error) {
 			return nil, err
 		}
 		record := genRecord(entity, d.fields)
-		data[cast.ToInt(record[d.primary])] = record
+		data[cast.ToInt(record[field])] = record
 	}
 	if len(data) == 0 {
 		return nil, sql.ErrNoRows
@@ -400,9 +384,6 @@ func (d *XSQL) RestSQL() {
 
 	if d.table != "" {
 		d.table = ""
-	}
-	if d.primary != primary {
-		d.primary = primary
 	}
 	if len(d.fields) > 0 {
 		d.fields = make([]string, 0, 20)

@@ -20,13 +20,14 @@ func TestXSQL(t *testing.T) {
 	db := xsql.NewXSQL(context.Background(), dbConfig)
 
 	//select
-	//db.Table("bag_0000").Primary("uid").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
+	//db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
 	//rawsql := db.GenRawSQL()
 	//fmt.Println("rawsql:::::::", rawsql)
 
-	//data, err := db.Table("bag_0000").Primary("uid").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
-	//data, err := db.Table("bag_0000").Primary("uid").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
-	data, err := db.Table("bag_0000").Primary("uid").Where("uid in (6)").QueryMap()
+	//data, err := db.Table("bag_0000").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
+	//data, err := db.Table("bag_0000").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
+	//data, err := db.Table("bag_0000").Where("uid in (6)").QueryMap("uid")
+	data, err := db.Table("bag_0000").Where("uid in (6)").Query()
 	//sql := db.Table("bag_0000").Fields("uid,item").Where("uid in (6)").GenRawSQL()
 	fmt.Println("err:::::::", err)
 	fmt.Println("data:::::::", data)

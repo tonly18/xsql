@@ -3,8 +3,6 @@ package xsql
 import "time"
 
 const (
-	//默认主键
-	primary = "id"
 	//最大存活时长
 	maxLifeTime = 3600
 	//最大空闲时长
