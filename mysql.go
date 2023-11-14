@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/cast"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -246,6 +247,12 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 // QueryMap 查询数据
 func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 	defer d.RestSQL()
+
+	if len(d.fields) > 0 {
+		if false == slices.Contains(d.fields, field) {
+			d.fields = append(d.fields, field)
+		}
+	}
 
 	//生成SQL
 	rawsql := d.GenRawSQL()
