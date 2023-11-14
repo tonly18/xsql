@@ -248,21 +248,24 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 	defer d.RestSQL()
 
+	//field
 	if len(d.fields) > 0 {
 		if false == slices.Contains(d.fields, field) {
 			d.fields = append(d.fields, field)
 		}
 	}
 
-	//生成SQL
+	//generate sql
 	rawsql := d.GenRawSQL()
 
-	//QUERY
+	//query
 	rows, err := d.db.Query(rawsql)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
+	//field
 	if len(d.fields) == 0 {
 		d.fields, _ = rows.Columns()
 	}
