@@ -59,7 +59,6 @@ func NewXSQL(ctx context.Context, config *Config) *XSQL {
 
 // connect
 func (d *XSQL) connect(config *Config) error {
-	var err error
 	if config.Charset == "" {
 		config.Charset = "utf8"
 	}
@@ -75,6 +74,8 @@ func (d *XSQL) connect(config *Config) error {
 	if config.MaxIdleConns == 0 {
 		config.MaxIdleConns = maxIdleConns
 	}
+
+	var err error
 	dbConn, err = sql.Open("mysql", fmt.Sprintf(`%s:%s@tcp(%s:%d)/%s?charset=%s`, config.UserName, config.Password, config.Host, config.Port, config.DBName, config.Charset))
 	if err != nil {
 		return fmt.Errorf(`[connect] sql.Open error: %w`, err)
