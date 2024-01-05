@@ -290,8 +290,13 @@ func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 
 // GenRawSQL 生成查询SQL
 func (d *XSQL) GenRawSQL() string {
-	var rawsql strings.Builder
+	//modify|insert|delete sql
+	if len(d.sql) > 0 {
+		return d.sql
+	}
 
+	//query sql
+	var rawsql strings.Builder
 	if len(d.fields) == 0 {
 		rawsql.WriteString(fmt.Sprintf(`SELECT * FROM %v`, d.table))
 	} else {
@@ -325,8 +330,6 @@ func (d *XSQL) GenRawSQL() string {
 
 // Insert 插入数据
 func (d *XSQL) Insert(params map[string]any) *XSQL {
-	defer d.RestSQL()
-
 	for k, v := range params {
 		d.fields = append(d.fields, k)
 		d.values = append(d.values, v)
@@ -341,8 +344,6 @@ func (d *XSQL) Insert(params map[string]any) *XSQL {
 
 // Modify 修改数据
 func (d *XSQL) Modify(params map[string]any) *XSQL {
-	defer d.RestSQL()
-
 	for k, v := range params {
 		d.fields = append(d.fields, fmt.Sprintf(`%v=?`, k))
 		d.values = append(d.values, v)
@@ -360,8 +361,6 @@ func (d *XSQL) Modify(params map[string]any) *XSQL {
 
 // Delete 删除数据
 func (d *XSQL) Delete() *XSQL {
-	defer d.RestSQL()
-
 	d.sql = fmt.Sprintf(`DELETE FROM %v`, d.table)
 	if len(d.where) > 0 {
 		d.sql = fmt.Sprintf(`%v WHERE %v`, d.sql, strings.Join(d.where, ""))
