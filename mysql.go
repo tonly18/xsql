@@ -306,7 +306,7 @@ func (d *XSQL) GenRawSQL() string {
 		rawsql.WriteString(fmt.Sprintf(` WHERE %v`, strings.Join(d.where, "")))
 	}
 	if d.group != "" {
-		rawsql.WriteString(fmt.Sprintf(` GROUP BY %v`, d.order))
+		rawsql.WriteString(fmt.Sprintf(` GROUP BY %v`, d.group))
 	}
 	if d.have != "" {
 		rawsql.WriteString(fmt.Sprintf(` HAVING %v`, d.have))
