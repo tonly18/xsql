@@ -200,6 +200,17 @@ func (d *XSQL) OrderBy(order string) *XSQL {
 	return d
 }
 
+// RawQuery 原始Query SQL
+func (d *XSQL) RawQuery(rawsql string, value ...any) (*sql.Rows, error) {
+	rows, err := d.db.Query(rawsql, value...)
+	if err != nil {
+		return nil, err
+	}
+
+	//return
+	return rows, nil
+}
+
 // QueryRow 查询单条数据
 func (d *XSQL) QueryRow() (map[string]any, error) {
 	data, err := d.Query()
@@ -385,6 +396,17 @@ func (d *XSQL) Exec() (sql.Result, error) {
 		return nil, err
 	}
 
+	return result, nil
+}
+
+// RawExec 原始Exec SQL
+func (d *XSQL) RawExec(rawsql string, value ...any) (sql.Result, error) {
+	result, err := d.db.Exec(rawsql, value...)
+	if err != nil {
+		return nil, err
+	}
+
+	//return
 	return result, nil
 }
 
