@@ -36,19 +36,16 @@ func TestXSQL(t *testing.T) {
 	//	fmt.Println("sql.ErrNoRows::::::", sql.ErrNoRows)
 	//}
 
-	rows, err := db.RawQuery("SELECT `item`, count(item) as num FROM `bag_0000` group by `item`")
+	rows, err := db.RawQuery("SELECT * FROM `bag_0000` where uid=?", 100)
 	fmt.Println("err:::::", err)
-	fmt.Println("rows:::::", rows)
 	for rows.Next() {
-		//var item, expire string
-		//var uid, itime int
-		var item string
-		var num int
-		if err := rows.Scan(&item, &num); err != nil {
+		var item, expire string
+		var uid, itime int
+		if err := rows.Scan(&uid, &item, &expire, &itime); err != nil {
 			fmt.Println("err::::", err)
 			continue
 		}
-		fmt.Println("uid, item, expire:::", item, num)
+		fmt.Println("uid, item, expire:::", uid, item, expire, itime)
 	}
 
 	//Insert
@@ -66,8 +63,10 @@ func TestXSQL(t *testing.T) {
 
 	result, err := db.RawExec("insert into bag_0000(uid,item,expire,itime) values(101, \"item-101\", 123456, 789)")
 	fmt.Println("err::::", err)
-	n, _ := result.RowsAffected()
-	fmt.Println("result::::", n)
+	if result != nil {
+		n, _ := result.RowsAffected()
+		fmt.Println("result::::", n)
+	}
 
 	//modify
 	//result, err := db.Table("bag_0001").Where("uid=17").Modify(map[string]any{
