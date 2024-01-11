@@ -101,6 +101,7 @@ func (d *XSQL) connect(config *Config) error {
 	runtime.SetFinalizer(dbConn, func(conn *sql.DB) {
 		conn.Close()
 	})
+	runtime.KeepAlive(dbConn)
 
 	//return
 	return nil
@@ -247,6 +248,9 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 		}
 		data = append(data, genRecord(entity, d.fields))
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	if len(data) == 0 {
 		return nil, sql.ErrNoRows
 	}
@@ -290,6 +294,9 @@ func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 		}
 		record := genRecord(entity, d.fields)
 		data[cast.ToInt(record[field])] = record
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	if len(data) == 0 {
 		return nil, sql.ErrNoRows
