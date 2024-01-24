@@ -1,7 +1,6 @@
 package xsql
 
 import (
-	"database/sql"
 	"unsafe"
 )
 
@@ -18,7 +17,7 @@ func stringToBytes(s string) []byte {
 func genEntity(length int) []any {
 	entity := make([]any, 0, length)
 	for i := 0; i < length; i++ {
-		entity = append(entity, new(sql.RawBytes))
+		entity = append(entity, new([]byte))
 	}
 
 	return entity
@@ -27,7 +26,7 @@ func genEntity(length int) []any {
 func genRecord(data []any, fields []string) map[string]any {
 	record := make(map[string]any, len(fields))
 	for k, v := range data {
-		record[fields[k]] = bytesToString(*v.(*sql.RawBytes))
+		record[fields[k]] = bytesToString(*v.(*[]byte))
 	}
 
 	return record

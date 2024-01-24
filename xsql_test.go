@@ -19,9 +19,18 @@ func TestXSQL(t *testing.T) {
 	db := xsql.NewXSQL(context.Background(), dbConfig)
 
 	//select
-	db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
-	rawsql := db.GenRawSQL()
-	fmt.Println("rawsql:::::::", rawsql)
+	//db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6,8)")
+	//rawsql := db.GenRawSQL()
+	//fmt.Println("rawsql:::::::", rawsql)
+
+	data1, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6)").Query()
+	fmt.Println("data1::::::", data1)
+	data2, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (8)").Query()
+	fmt.Println("data2::::::", data2)
+
+	fmt.Println("over！")
+
+	return
 
 	//data, err := db.Table("bag_0000").Fields("uid", "item2", "expire", "itime").Where("uid in (6,8)").Query()
 	//data, err := db.Table("bag_0000").Fields("item", "expire", "itime").Where("uid in (6)").QueryRow()
