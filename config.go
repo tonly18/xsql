@@ -4,7 +4,7 @@ import "time"
 
 const (
 	//最大存活时长
-	maxLifeTime = 3600
+	maxLifeTime = 1800
 	//最大空闲时长
 	maxIdleTime = 600
 	//同时最大链接数
