@@ -1,6 +1,9 @@
 package xsql
 
-import "time"
+import (
+	"github.com/go-sql-driver/mysql"
+	"time"
+)
 
 const (
 	//最大存活时长
@@ -25,4 +28,6 @@ type Config struct {
 	MaxIdleTime  time.Duration
 	MaxOpenConns int
 	MaxIdleConns int
+
+	Logger mysql.Logger //日志发生器
 }

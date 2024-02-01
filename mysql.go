@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/spf13/cast"
 	"runtime"
 	"slices"
@@ -74,6 +74,10 @@ func (d *XSQL) connect(config *Config) error {
 	}
 	if config.MaxIdleConns == 0 {
 		config.MaxIdleConns = maxIdleConns
+	}
+	if config.Logger != nil {
+		//设置mysql日志
+		mysql.SetLogger(config.Logger)
 	}
 
 	var err error
@@ -415,6 +419,15 @@ func (d *XSQL) RawExec(rawsql string, value ...any) (sql.Result, error) {
 
 	//return
 	return result, nil
+}
+
+// ConnRaw
+func (d *XSQL) ConnRaw(fn func(driverConn any) error) error {
+	conn, err := d.db.Conn(d.ctx)
+	if err != nil {
+		return err
+	}
+	return conn.Raw(fn)
 }
 
 // RestSQL
