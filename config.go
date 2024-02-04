@@ -1,7 +1,6 @@
 package xsql
 
 import (
-	"github.com/go-sql-driver/mysql"
 	"time"
 )
 
@@ -29,5 +28,5 @@ type Config struct {
 	MaxOpenConns int
 	MaxIdleConns int
 
-	Logger mysql.Logger //日志发生器
+	//Logger mysql.Logger //日志记录器
 }

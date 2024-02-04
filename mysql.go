@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/cast"
 	"runtime"
 	"slices"
@@ -74,10 +74,6 @@ func (d *XSQL) connect(config *Config) error {
 	}
 	if config.MaxIdleConns == 0 {
 		config.MaxIdleConns = maxIdleConns
-	}
-	if config.Logger != nil {
-		//设置mysql日志
-		mysql.SetLogger(config.Logger)
 	}
 
 	var err error
