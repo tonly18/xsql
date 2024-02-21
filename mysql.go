@@ -309,7 +309,7 @@ func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 
 // GenRawSQL 生成查询SQL
 func (d *XSQL) GenRawSQL() string {
-	//modify|insert|delete sql
+	//update|insert|delete sql
 	if len(d.sql) > 0 {
 		return d.sql
 	}
