@@ -260,6 +260,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 }
 
 // QueryMap 查询数据
+// field		string		通常是主键
 func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 	defer d.RestSQL()
 
