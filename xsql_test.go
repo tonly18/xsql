@@ -47,6 +47,7 @@ func TestXSQL(t *testing.T) {
 
 	rows, err := db.RawQuery("SELECT * FROM `bag_0000` where uid=?", 100)
 	fmt.Println("err:::::", err)
+	defer rows.Close()
 	for rows.Next() {
 		var item, expire string
 		var uid, itime int
