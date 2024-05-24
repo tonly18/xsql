@@ -101,6 +101,7 @@ func (d *XSQL) connect(config *Config) error {
 	runtime.SetFinalizer(dbConn, func(conn *sql.DB) {
 		conn.Close()
 	})
+	//保证传入的参数在这个方法被调用之前不被垃圾回收器回收掉
 	runtime.KeepAlive(dbConn)
 
 	//return
