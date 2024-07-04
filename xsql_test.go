@@ -25,8 +25,14 @@ func TestXSQL(t *testing.T) {
 
 	data1, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6)").Query()
 	fmt.Println("data1::::::", data1)
-	data2, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (8)").Query()
+	data2, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6, 8, 100, 101)").QueryMap("uid")
 	fmt.Println("data2::::::", data2)
+	for k, v := range data2 {
+		fmt.Println("\nk-v::::::", k)
+		for key, val := range v {
+			fmt.Println("	key-val::::::", key, string(val))
+		}
+	}
 
 	fmt.Println("over！")
 

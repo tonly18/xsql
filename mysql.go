@@ -214,7 +214,7 @@ func (d *XSQL) RawQuery(rawsql string, value ...any) (*sql.Rows, error) {
 }
 
 // QueryRow 查询单条数据
-func (d *XSQL) QueryRow() (map[string]any, error) {
+func (d *XSQL) QueryRow() (map[string][]byte, error) {
 	data, err := d.Query()
 	if err != nil {
 		return nil, err
@@ -224,7 +224,7 @@ func (d *XSQL) QueryRow() (map[string]any, error) {
 }
 
 // Query 查询数据
-func (d *XSQL) Query() ([]map[string]any, error) {
+func (d *XSQL) Query() ([]map[string][]byte, error) {
 	defer d.RestSQL()
 
 	//生成SQL
@@ -241,7 +241,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 	}
 
 	//字段 - 数据
-	data := make([]map[string]any, 0, 20)
+	data := make([]map[string][]byte, 0, 20)
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
@@ -262,7 +262,7 @@ func (d *XSQL) Query() ([]map[string]any, error) {
 
 // QueryMap 查询数据
 // field		string		通常是主键
-func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
+func (d *XSQL) QueryMap(field string) (map[int]map[string][]byte, error) {
 	if field == "" {
 		return nil, errors.New("field can not be empty")
 	}
@@ -291,14 +291,14 @@ func (d *XSQL) QueryMap(field string) (map[int]map[string]any, error) {
 	}
 
 	//字段 - 数据
-	data := make(map[int]map[string]any, 50)
+	data := make(map[int]map[string][]byte, 50)
 	entity := genEntity(len(d.fields))
 	for rows.Next() {
 		if err := rows.Scan(entity...); err != nil {
 			return nil, err
 		}
 		record := genRecord(entity, d.fields)
-		data[cast.ToInt(record[field])] = record
+		data[cast.ToInt(string(record[field]))] = record
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

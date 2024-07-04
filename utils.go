@@ -26,10 +26,10 @@ func genEntity(length int) []any {
 	return entity
 }
 
-func genRecord(data []any, fields []string) map[string]any {
-	record := make(map[string]any, len(fields))
+func genRecord(data []any, fields []string) map[string][]byte {
+	record := make(map[string][]byte, len(fields))
 	for k, v := range data {
-		record[fields[k]] = bytesToString(*v.(*[]byte))
+		record[fields[k]] = *(v.(*[]byte))
 	}
 
 	return record
