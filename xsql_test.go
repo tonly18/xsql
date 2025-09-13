@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/tonly18/xsql"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestXSQL(t *testing.T) {
@@ -107,4 +109,31 @@ func TestXSQL(t *testing.T) {
 	//tx, err := db.Begin()
 	//fmt.Println("err::::::::", err)
 	//fmt.Println("tx:::::::::", tx)
+}
+
+// 并发安全测试
+func TestConcurrencySafety(t *testing.T) {
+	db := xsql.NewXSQL(context.Background(), &xsql.Config{
+		Host:     "127.0.0.1",
+		Port:     3306,
+		UserName: "root",
+		Password: "123456",
+		DBName:   "test",
+		Charset:  "utf8",
+	})
+
+	for i := 0; i < 100; i++ {
+		go func(x int) {
+			id := rand.Intn(6) + 1
+			where := fmt.Sprintf(`id=%d`, id)
+			data, err := db.Table("employees").Fields("id", "name", "age").Where(where).Query()
+			if err != nil {
+				fmt.Println("err::::::", err)
+			}
+			fmt.Printf("x:%d, data:%v\n", x, data)
+		}(i)
+	}
+
+	time.Sleep(time.Second * 10)
+	fmt.Println("main-over")
 }
