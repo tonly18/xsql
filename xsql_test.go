@@ -14,7 +14,7 @@ func TestXSQL(t *testing.T) {
 		Host:     "127.0.0.1",
 		Port:     3306,
 		UserName: "root",
-		Password: "",
+		Password: "123456",
 		DBName:   "test",
 		Charset:  "utf8",
 	}
@@ -25,9 +25,10 @@ func TestXSQL(t *testing.T) {
 	//rawsql := db.GenRawSQL()
 	//fmt.Println("rawsql:::::::", rawsql)
 
-	data1, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6)").Query()
+	data1, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (2)").Query()
 	fmt.Println("data1::::::", data1)
-	data2, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6, 8, 100, 101)").QueryMap("uid")
+
+	data2, err := db.Table("bag_0000").Fields("uid", "item", "expire", "itime").Where("uid in (6, 8, 100, 2)").QueryMap("uid")
 	fmt.Println("data2::::::", data2)
 	for k, v := range data2 {
 		fmt.Println("\nk-v::::::", k)
@@ -37,6 +38,13 @@ func TestXSQL(t *testing.T) {
 	}
 
 	fmt.Println("over！")
+
+	result, err := db.RawExec("insert into bag_0000(uid,item,expire,itime) values(3, \"item-3\", 123456, 333)")
+	fmt.Println("err::::", err)
+	if result != nil {
+		n, _ := result.RowsAffected()
+		fmt.Println("result::::", n)
+	}
 
 	return
 
@@ -79,13 +87,6 @@ func TestXSQL(t *testing.T) {
 	//newId, err := result.LastInsertId()
 	//fmt.Println("result-newId,err::::::::", newId, err)
 
-	result, err := db.RawExec("insert into bag_0000(uid,item,expire,itime) values(101, \"item-101\", 123456, 789)")
-	fmt.Println("err::::", err)
-	if result != nil {
-		n, _ := result.RowsAffected()
-		fmt.Println("result::::", n)
-	}
-
 	//modify
 	//result, err := db.Table("bag_0001").Where("uid=17").Modify(map[string]any{
 	//	"item":   "item-17-m",
@@ -126,14 +127,20 @@ func TestConcurrencySafety(t *testing.T) {
 		go func(x int) {
 			id := rand.Intn(6) + 1
 			where := fmt.Sprintf(`id=%d`, id)
+
+			rawsql := db.Table("employees").Fields("id", "name", "age").Where(where).GenRawSQL()
+			fmt.Println("rawsql:", rawsql)
+
 			data, err := db.Table("employees").Fields("id", "name", "age").Where(where).Query()
 			if err != nil {
-				fmt.Println("err::::::", err)
+				panic(err)
 			}
-			fmt.Printf("x:%d, data:%v\n", x, data)
+			for _, v := range data {
+				fmt.Println("x:", x, ", id:", string(v["id"]), " name:", string(v["name"]), " age:", string(v["age"]))
+			}
 		}(i)
 	}
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 3)
 	fmt.Println("main-over")
 }

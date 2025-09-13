@@ -35,8 +35,8 @@ type XSQL struct {
 }
 
 // NewXSQL
-func NewXSQL(ctx context.Context, config *Config) *XSQL {
-	xsql := &XSQL{
+func NewXSQL(ctx context.Context, config *Config) XSQL {
+	xsql := XSQL{
 		ctx:    ctx,
 		fields: make([]string, 0, 20),
 		values: make([]any, 0, 20),
@@ -59,7 +59,7 @@ func NewXSQL(ctx context.Context, config *Config) *XSQL {
 }
 
 // connect
-func (d *XSQL) connect(config *Config) error {
+func (d XSQL) connect(config *Config) error {
 	if config.Charset == "" {
 		config.Charset = "utf8"
 	}
@@ -109,7 +109,7 @@ func (d *XSQL) connect(config *Config) error {
 }
 
 // Table 字段
-func (d *XSQL) Table(table string) *XSQL {
+func (d XSQL) Table(table string) XSQL {
 	d.table = table
 
 	//return
@@ -117,7 +117,7 @@ func (d *XSQL) Table(table string) *XSQL {
 }
 
 // Fields 字段
-func (d *XSQL) Fields(fields ...string) *XSQL {
+func (d XSQL) Fields(fields ...string) XSQL {
 	if len(fields) > 0 {
 		d.fields = append(d.fields, fields...)
 	}
@@ -127,7 +127,7 @@ func (d *XSQL) Fields(fields ...string) *XSQL {
 }
 
 // Where 条件
-func (d *XSQL) Where(condition string) *XSQL {
+func (d XSQL) Where(condition string) XSQL {
 	if condition != "" {
 		if len(d.where) == 0 {
 			d.where = append(d.where, condition)
@@ -141,7 +141,7 @@ func (d *XSQL) Where(condition string) *XSQL {
 }
 
 // ORWhere 条件
-func (d *XSQL) ORWhere(condition string) *XSQL {
+func (d XSQL) ORWhere(condition string) XSQL {
 	if condition != "" {
 		if len(d.where) == 0 {
 			d.where = append(d.where, condition)
@@ -155,7 +155,7 @@ func (d *XSQL) ORWhere(condition string) *XSQL {
 }
 
 // GroupBy 分组
-func (d *XSQL) GroupBy(group string) *XSQL {
+func (d XSQL) GroupBy(group string) XSQL {
 	d.group = group
 
 	//return
@@ -163,7 +163,7 @@ func (d *XSQL) GroupBy(group string) *XSQL {
 }
 
 // Having 分组条件
-func (d *XSQL) Having(having string) *XSQL {
+func (d XSQL) Having(having string) XSQL {
 	d.have = having
 
 	//return
@@ -171,7 +171,7 @@ func (d *XSQL) Having(having string) *XSQL {
 }
 
 // LeftJoin 关联
-func (d *XSQL) LeftJoin(join string) *XSQL {
+func (d XSQL) LeftJoin(join string) XSQL {
 	d.leftJoin = join
 
 	//return
@@ -179,7 +179,7 @@ func (d *XSQL) LeftJoin(join string) *XSQL {
 }
 
 // RightJoin 关联
-func (d *XSQL) RightJoin(join string) *XSQL {
+func (d XSQL) RightJoin(join string) XSQL {
 	d.rightJoin = join
 
 	//return
@@ -187,7 +187,7 @@ func (d *XSQL) RightJoin(join string) *XSQL {
 }
 
 // ON 关联
-func (d *XSQL) ON(on string) *XSQL {
+func (d XSQL) ON(on string) XSQL {
 	d.on = on
 
 	//return
@@ -195,7 +195,7 @@ func (d *XSQL) ON(on string) *XSQL {
 }
 
 // OrderBy 排序
-func (d *XSQL) OrderBy(order string) *XSQL {
+func (d XSQL) OrderBy(order string) XSQL {
 	d.order = order
 
 	//return
@@ -203,7 +203,7 @@ func (d *XSQL) OrderBy(order string) *XSQL {
 }
 
 // RawQuery 原始Query SQL
-func (d *XSQL) RawQuery(rawsql string, value ...any) (*sql.Rows, error) {
+func (d XSQL) RawQuery(rawsql string, value ...any) (*sql.Rows, error) {
 	rows, err := d.db.Query(rawsql, value...)
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func (d *XSQL) RawQuery(rawsql string, value ...any) (*sql.Rows, error) {
 }
 
 // QueryRow 查询单条数据
-func (d *XSQL) QueryRow() (map[string][]byte, error) {
+func (d XSQL) QueryRow() (map[string][]byte, error) {
 	data, err := d.Query()
 	if err != nil {
 		return nil, err
@@ -224,9 +224,7 @@ func (d *XSQL) QueryRow() (map[string][]byte, error) {
 }
 
 // Query 查询数据
-func (d *XSQL) Query() ([]map[string][]byte, error) {
-	defer d.RestSQL()
-
+func (d XSQL) Query() ([]map[string][]byte, error) {
 	//生成SQL
 	rawsql := d.GenRawSQL()
 
@@ -262,11 +260,10 @@ func (d *XSQL) Query() ([]map[string][]byte, error) {
 
 // QueryMap 查询数据
 // field		string		通常是主键
-func (d *XSQL) QueryMap(field string) (map[int]map[string][]byte, error) {
+func (d XSQL) QueryMap(field string) (map[int]map[string][]byte, error) {
 	if field == "" {
 		return nil, errors.New("field can not be empty")
 	}
-	defer d.RestSQL()
 
 	//field
 	if len(d.fields) > 0 {
@@ -312,7 +309,7 @@ func (d *XSQL) QueryMap(field string) (map[int]map[string][]byte, error) {
 }
 
 // GenRawSQL 生成查询SQL
-func (d *XSQL) GenRawSQL() string {
+func (d XSQL) GenRawSQL() string {
 	//update|insert|delete sql
 	if len(d.sql) > 0 {
 		return d.sql
@@ -352,7 +349,7 @@ func (d *XSQL) GenRawSQL() string {
 }
 
 // Insert 插入数据
-func (d *XSQL) Insert(params map[string]any) *XSQL {
+func (d XSQL) Insert(params map[string]any) XSQL {
 	for k, v := range params {
 		d.fields = append(d.fields, k)
 		d.values = append(d.values, v)
@@ -366,7 +363,7 @@ func (d *XSQL) Insert(params map[string]any) *XSQL {
 }
 
 // Modify 修改数据
-func (d *XSQL) Modify(params map[string]any) *XSQL {
+func (d XSQL) Modify(params map[string]any) XSQL {
 	for k, v := range params {
 		d.fields = append(d.fields, fmt.Sprintf(`%v=?`, k))
 		d.values = append(d.values, v)
@@ -383,7 +380,7 @@ func (d *XSQL) Modify(params map[string]any) *XSQL {
 }
 
 // Delete 删除数据
-func (d *XSQL) Delete() *XSQL {
+func (d XSQL) Delete() XSQL {
 	d.sql = fmt.Sprintf(`DELETE FROM %v`, d.table)
 	if len(d.where) > 0 {
 		d.sql = fmt.Sprintf(`%v WHERE %v`, d.sql, strings.Join(d.where, ""))
@@ -394,9 +391,7 @@ func (d *XSQL) Delete() *XSQL {
 }
 
 // Exec 执行SQL
-func (d *XSQL) Exec() (sql.Result, error) {
-	defer d.RestSQL()
-
+func (d XSQL) Exec() (sql.Result, error) {
 	stmt, err := d.db.Prepare(d.sql)
 	if err != nil {
 		return nil, err
@@ -412,7 +407,7 @@ func (d *XSQL) Exec() (sql.Result, error) {
 }
 
 // RawExec 原始Exec SQL
-func (d *XSQL) RawExec(rawsql string, value ...any) (sql.Result, error) {
+func (d XSQL) RawExec(rawsql string, value ...any) (sql.Result, error) {
 	result, err := d.db.Exec(rawsql, value...)
 	if err != nil {
 		return nil, err
@@ -423,7 +418,7 @@ func (d *XSQL) RawExec(rawsql string, value ...any) (sql.Result, error) {
 }
 
 // ConnRaw
-func (d *XSQL) ConnRaw(fn func(driverConn any) error) error {
+func (d XSQL) ConnRaw(fn func(driverConn any) error) error {
 	conn, err := d.db.Conn(d.ctx)
 	if err != nil {
 		return err
@@ -431,44 +426,8 @@ func (d *XSQL) ConnRaw(fn func(driverConn any) error) error {
 	return conn.Raw(fn)
 }
 
-// RestSQL
-func (d *XSQL) RestSQL() {
-	d.sql = ""
-
-	if d.table != "" {
-		d.table = ""
-	}
-	if len(d.fields) > 0 {
-		d.fields = make([]string, 0, 20)
-	}
-	if len(d.values) > 0 {
-		d.values = make([]any, 0, 20)
-	}
-	if len(d.where) > 0 {
-		d.where = make([]string, 0, 5)
-	}
-	if d.group != "" {
-		d.group = ""
-	}
-	if d.have != "" {
-		d.have = ""
-	}
-	if d.order != "" {
-		d.order = ""
-	}
-	if d.on != "" {
-		d.on = ""
-	}
-	if d.leftJoin != "" {
-		d.leftJoin = ""
-	}
-	if d.rightJoin != "" {
-		d.rightJoin = ""
-	}
-}
-
 // Transaction
-func (d *XSQL) Begin() (*sql.Tx, error) {
+func (d XSQL) Begin() (*sql.Tx, error) {
 	tx, err := d.db.Begin()
 	if err != nil {
 		return nil, err
